@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cadastrar Produto</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .container {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        width: 400px;
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+      }
+
+      label {
+        font-weight: bold;
+        margin-top: 10px;
+        color: #555;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 15px;
+      }
+
+      textarea {
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+        width: 100%;
+        height: 40px;
+        box-sizing: border-box;
+      }
+
+      button {
+        background-color: #007bff;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+        font-size: 16px;
+      }
+
+      button:hover {
+        background-color: #0069d9;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 10px;
+        justify-content: space-between;
+      }
+
+      .back-link {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+        font-size: 16px;
+        color: #007bff;
+        text-decoration: none;
+      }
+
+      .back-link:hover {
+        text-decoration: underline;
+      }
+
+      .form-group .flex-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .form-group .flex-group button {
+        flex-grow: 1;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Cadastrar Produto</h1>
+      <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+        <div class="form-group">
+          {{ form.codigo.label_tag }}
+          <div class="flex-group">
+            {{ form.codigo }}
+            <button type="button" id="btnConsultar">Consultar</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          {{ form.descricao.label_tag }} {{ form.descricao }}
+        </div>
+
+        <div class="form-group">
+          {{ form.marca.label_tag }} {{ form.marca }}
+        </div>
+
+        <div class="form-group">
+          {{ form.quantidade_minima.label_tag }} {{ form.quantidade_minima }}
+        </div>
+
+        <div class="form-group">
+          {{ form.quantidade.label_tag }} {{ form.quantidade }}
+        </div>
+
+        <div class="form-group">
+          {{ form.custo.label_tag }} {{ form.custo }}
+        </div>
+
+        <div class="form-group">
+          {{ form.preco.label_tag }} {{ form.preco }}
+        </div>
+
+        <div class="form-group">
+          {{ form.observacao.label_tag }} {{ form.observacao }}
+        </div>
+
+        <div class="button-group">
+          <button type="submit">Salvar</button>
+          <button type="button" id="btnLimpar" style="background-color: #6c757d">Limpar</button>
+          <button type="button" id="btnExcluir" style="background-color: #dc3545">Excluir</button>
+        </div>
+      </form>
+
+      <a href="{% url 'lista_produtos' %}" class="back-link">Voltar para Lista de Produtos</a>
+    </div>
+
+    <script>
+      const csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+      document.getElementById('btnConsultar').addEventListener('click', function () {
+        let codigo = document.querySelector('input[name="codigo"]').value;
+
+        if (!codigo) {
+          alert('Por favor, insira um código válido.');
+          return;
+        }
+
+        fetch(`/produtos/consultar/${codigo}/`)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Produto não encontrado.');
+            }
+            return response.json();
+          })
+          .then(data => {
+            document.querySelector('input[name="descricao"]').value = data.descricao;
+            document.querySelector('input[name="marca"]').value = data.marca;
+            document.querySelector('input[name="quantidade_minima"]').value = data.quantidade_minima;
+            document.querySelector('input[name="quantidade"]').value = data.quantidade;
+            document.querySelector('input[name="custo"]').value = data.custo;
+            document.querySelector('input[name="preco"]').value = data.preco;
+            document.querySelector('textarea[name="observacao"]').value = data.observacao;
+          })
+          .catch(error => {
+            alert(error.message);
+          });
+      });
+
+      document.getElementById('btnLimpar').addEventListener('click', function () {
+        document.querySelectorAll('input, textarea').forEach(el => el.value = '');
+      });
+
+      document.getElementById('btnExcluir').addEventListener('click', function () {
+        let codigo = document.querySelector('input[name="codigo"]').value;
+
+        if (!codigo) {
+          alert('Por favor, insira um código válido.');
+          return;
+        }
+
+        if (confirm('Tem certeza de que deseja excluir este produto?')) {
+          fetch(`/produtos/excluir/${codigo}/`, {
+            method: 'DELETE',
+            headers: {
+              'X-CSRFToken': csrftoken
+            }
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Erro ao excluir produto.');
+            }
+            alert('Produto excluído com sucesso.');
+            document.getElementById('btnLimpar').click();
+          })
+          .catch(error => {
+            alert(error.message);
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
