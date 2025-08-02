@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'Menu',
     'clientes',
     'produtos',  # app 3
+    'vendas',
 ]
 
 
@@ -67,6 +68,7 @@ TEMPLATES = [
             BASE_DIR / 'Menu/templates',     
             BASE_DIR / 'clientes/templates',     
             BASE_DIR / 'produtos/templates',     
+            BASE_DIR / 'vendas/templates',     
 
         ],
         'OPTIONS': {

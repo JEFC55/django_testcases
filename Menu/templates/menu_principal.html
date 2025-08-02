@@ -85,9 +85,9 @@
     </div>
     <div class="menu-container">
         <a href="{%url 'lista_clientes'%}" class="menu-item">Cad Cli</a>
-        <a href="{%url 'listar_produtos'%}" class="menu-item">Cad Prod</a>
+        <a href="{%url 'lista_produtos'%}" class="menu-item">Cad Prod</a>
         <a href="" class="menu-item">Cad User</a>
-        <a href="" class="menu-item">Vendas</a>
+        <a href="{%url 'lista_vendas'%}" class="menu-item">Vendas</a>
         <a href="" class="menu-item">Relatório</a>
         <form action="{% url 'logout' %}" method="post" style="margin: 0; padding: 0;">
             {% csrf_token %}

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Venda</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            width: 500px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #e9f5ff;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #0069d9;
+        }
+
+        .btn-finalizar {
+            background-color: green;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Venda #{{ venda.num_venda }}</h1>
+    <p><strong>Cliente:</strong> {{ venda.cliente.nome }}</p>
+    <p><strong>Total:</strong> R$ <span id="total_venda">{{ venda.total_venda|floatformat:2 }}</span></p>
+
+    <h2>Itens Adicionados</h2>
+    <table>
+        <tr>
+            <th>Produto</th>
+            <th>Quantidade</th>
+            <th>Valor Unitário</th>
+            <th>Valor Total</th>
+            <th>Ações</th>
+        </tr>
+        {% for item in itens %}
+        <tr id="item-{{ item.id }}">
+            <td>{{ item.produto.descricao }}</td>
+            <td>{{ item.quantidade }}</td>
+            <td>R$ {{ item.valor_unit|floatformat:2 }}</td>
+            <td>R$ <span class="valor-item">{{ item.valor_total|floatformat:2 }}</span></td>
+            <td>
+                <a href="{% url 'excluir_item_venda' item.id %}" style="color: red; text-decoration: none; font-weight: bold;" 
+                   onclick="return confirmarExclusao({{ item.id }})">Excluir</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" style="text-align: center; color: #888;">Nenhum item adicionado</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Adicionar Item</h2>
+    <form method="POST" id="formAdicionarItem">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="id_produto">Produto:</label>
+            <select name="produto" id="id_produto" onchange="atualizarPreco()">
+                <option value="">Selecione um produto</option>
+                {% for produto in form.fields.produto.queryset %}
+                    <option value="{{ produto.id }}" data-preco="{{ produto.preco }}">{{ produto.descricao }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="id_quantidade">Quantidade:</label>
+            <input type="number" name="quantidade" id="id_quantidade" min="1" value="1" oninput="calcularValorTotal()">
+        </div>
+
+        <div class="form-group">
+            <label for="id_valor_unit">Preço Unitário:</label>
+            <input type="text" id="id_valor_unit" name="valor_unit" readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="id_valor_total">Valor Total:</label>
+            <input type="text" id="id_valor_total" name="valor_total" readonly>
+        </div>
+
+        <button type="submit" id="btn-adicionar">Adicionar Item</button>
+    </form>
+
+    <form action="{% url 'imprimir_venda' venda.num_venda %}" method="get">
+        <button type="submit" class="btn-finalizar">Finalizar Venda</button>
+    </form>
+
+    <a href="{% url 'lista_vendas' %}" class="back-link">Voltar para Lista de Vendas</a>
+</div>
+
+<script>
+    function atualizarPreco() {
+        var selectProduto = document.getElementById("id_produto");
+        var selectedOption = selectProduto.options[selectProduto.selectedIndex];
+        var preco = parseFloat(selectedOption.getAttribute("data-preco")) || 0;
+        document.getElementById("id_valor_unit").value = preco.toFixed(2);
+        calcularValorTotal();
+    }
+
+    function calcularValorTotal() {
+        var preco = parseFloat(document.getElementById("id_valor_unit").value) || 0;
+        var quantidade = parseInt(document.getElementById("id_quantidade").value) || 1;
+        var valorTotal = preco * quantidade;
+        document.getElementById("id_valor_total").value = valorTotal.toFixed(2);
+    }
+</script>
+</body>
+</html>

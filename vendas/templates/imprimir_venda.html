@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impressão de Venda</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        table { width: 80%; margin: 0 auto; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid black; }
+        .btn { display: block; margin: 20px auto; padding: 10px; width: 200px; text-align: center; background: blue; color: white; text-decoration: none; }
+        .btn-print { background: green; }
+    </style>
+</head>
+<body>
+    <h1>Venda #{{ venda.num_venda }}</h1>
+    <p><strong>Cliente:</strong> {{ venda.cliente.nome }}</p>
+    <p><strong>Total:</strong> R$ {{ venda.total_venda }}</p>
+
+    <table>
+        <tr>
+            <th>Produto</th>
+            <th>Quantidade</th>
+            <th>Valor Unitário</th>
+            <th>Valor</th>
+        </tr>
+        {% for item in itens %}
+        <tr>
+            <td>{{ item.produto.descricao }}</td>
+            <td>{{ item.quantidade }}</td>
+            <td>R$ {{ item.valor_unit }}</td>
+            <td>R$ {{ item.valor_total }}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td colspan="3" style="text-align: right; font-weight: bold;">Valor Total:</td>
+            <td><strong>R$ {{ venda.total_venda }}</strong></td>
+        </tr>
+    </table>
+
+    <button class="btn btn-print" onclick="window.print()">Imprimir</button>
+    <a href="{% url 'lista_vendas' %}" class="btn">Voltar para Lista de Vendas</a>
+</body>
+</html>
