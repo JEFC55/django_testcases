@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Menu Principal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            background-color: #885d0d;
+            background: linear-gradient(to bottom,#332305, #885d0d);
+        }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            background-color: #edead8;
+            padding: 10px 20px;
+            border-color:rgb(0, 0, 0);
+            border-style: dotted;
+            border-width: 0px 0px 2px 0px;
+            box-shadow: rgba(53, 38, 5, 0.8) 10px;
+        }
+
+        .navbar img {
+            height: 50px;
+        }
+
+        .navbar-title {
+            color: rgb(0, 0, 0);
+            font-size: 24px;
+            font-family: 'Times New Roman', Times, serif;
+            margin-left: 20px;
+        }
+
+        .menu-container {
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #edead8;
+            text-align: center;
+            box-shadow: rgba(49, 34, 5, 0.6) 2px 5px ;
+            align-items: center;
+            justify-content: center;
+            display: flex;
+            position: absolute;
+            bottom: 3%;
+            left: 50%;
+            transform: translateX(-50%);
+            gap : 2px;
+        }
+
+        .menu-item {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: rgb(173, 119, 18);
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 5px;
+            width: 100px;
+            box-sizing: border-box;
+            border: none;
+        }
+
+        .menu-item:hover {
+            background-color: #332204;
+        }
+        .flor{
+            width: 50px;
+            height: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <img src="{% static 'img/fleur-de-lys-symbol.jpg' %}" alt="" class="flor">
+        <div class="navbar-title">JEF TEC</div>
+
+    </div>
+    <div class="menu-container">
+        <a href="{%url 'lista_clientes'%}" class="menu-item">Cad Cli</a>
+        <a href="" class="menu-item">Cad Prod</a>
+        <a href="" class="menu-item">Cad User</a>
+        <a href="" class="menu-item">Vendas</a>
+        <a href="" class="menu-item">Relatório</a>
+        <form action="{% url 'logout' %}" method="post" style="margin: 0; padding: 0;">
+            {% csrf_token %}
+            <button type="submit" class="menu-item">Sair</button>
+        </form>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar Cliente</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+            color: #555;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+
+        input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0069d9;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .form-group .flex-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group .flex-group button {
+			flex-grow: 1;
+        }
+		
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Cadastrar Cliente</h1>
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            {{ form.cpf.label_tag }}
+            <div class="flex-group">
+                {{ form.cpf }}
+                <button type="button" id="btnConsultar" style="padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Consultar</button>
+            </div>
+        </div>
+        <div class="form-group">
+            {{ form.rg.label_tag }}
+            {{ form.rg }}
+        </div>
+        <div class="form-group">
+            {{ form.nome.label_tag }}
+            {{ form.nome }}
+        </div>
+        
+        <div class="form-group">
+            {{ form.telefone.label_tag }}
+            {{ form.telefone }}
+        </div>
+        
+        <div class="form-group">
+            {{ form.email.label_tag }}
+            {{ form.email }}
+        </div>
+        <div class="form-group">
+            {{ form.titulo_eleitoral.label_tag }}
+            {{ form.titulo_eleitoral }}
+        </div>
+        <div class="form-group">
+            {{ form.escolaridade.label_tag }}
+            {{ form.escolaridade }}
+        </div>
+        <div class="form-group">
+            {{ form.profissao.label_tag }}
+            {{ form.profissao }}
+        </div>
+        <div class="button-group">
+            <button type="submit">Salvar</button>
+            <button type="button" id="btnLimpar" style="background-color: #6c757d;">Limpar</button>
+            <button type="button" id="btnExcluir" style="background-color: #dc3545;">Excluir</button>
+        </div>
+    </form>
+
+    <a href="{% url 'lista_clientes' %}" class="back-link">Voltar para Lista de Clientes</a>
+</div>
+
+<script>
+    // Consultar cliente
+    document.getElementById('btnConsultar').addEventListener('click', function () {
+        let cpf = document.querySelector('input[name="cpf"]').value;
+
+        // Remove pontos, traços e espaços do CPF
+        cpf = cpf.replace(/\D/g, '');
+
+        if (!cpf) {
+            alert('Por favor, insira um CPF válido.');
+            return;
+        }
+
+        fetch(/clientes/consultar_cliente/${cpf}/) // Corrigido para usar template string
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Cliente não encontrado.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.querySelector('input[name="rg"]').value = data.rg;
+                document.querySelector('input[name="nome"]').value = data.nome;
+                document.querySelector('input[name="telefone"]').value = data.telefone;
+                document.querySelector('input[name="email"]').value = data.email;
+                document.querySelector('input[name="titulo_eleitoral"]').value = data.titulo_eleitoral ;
+                document.querySelector('input[name="escolaridade"]').value = data.escolaridade ;
+                document.querySelector('input[name="profissao"]').value = data.profissao ;
+            })
+            .catch(error => {
+                alert(error.message);
+            });
+    });
+
+    // Limpar campos do formulário
+    document.getElementById('btnLimpar').addEventListener('click', function () {
+        document.querySelector('input[name="cpf"]').value = '';
+        document.querySelector('input[name="rg"]').value = '';
+        document.querySelector('input[name="nome"]').value = '';
+        document.querySelector('input[name="telefone"]').value = '';
+        document.querySelector('input[name="email"]').value = '';
+        document.querySelector('input[name="titulo_eleitoral"]').value = '';
+        document.querySelector('input[name="escolaridade"]').value = '';
+        document.querySelector('input[name="profissao"]').value = '';
+        document.querySelector('input[name="cpf"]').focus();
+    });
+
+    // Excluir cliente
+    document.getElementById('btnExcluir').addEventListener('click', function () {
+        const cpf = document.querySelector('input[name="cpf"]').value;
+
+        if (!cpf) {
+            alert('Por favor, insira um CPF válido para excluir.');
+            return;
+        }
+
+        if (confirm('Tem certeza de que deseja excluir este cliente?')) {
+            fetch(/clientes/excluir_cliente/${cpf}/, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao excluir cliente. Verifique se o CPF é válido.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Cliente excluído com sucesso.');
+                document.getElementById('btnLimpar').click(); // Limpar os campos
+            })
+            .catch(error => {
+                alert(error.message);
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
